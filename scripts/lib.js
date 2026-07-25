@@ -1,10 +1,10 @@
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
-const { loadEnv } = require("../../../src/loadEnv");
+const { loadEnv } = require("../src/loadEnv");
 
-const REPO_ROOT = path.resolve(__dirname, "..", "..", "..");
-const LAB_ROOT = path.resolve(__dirname, "..");
+const REPO_ROOT = path.resolve(__dirname, "..");
+const LAB_ROOT = REPO_ROOT;
 
 loadEnv(REPO_ROOT);
 
@@ -193,7 +193,7 @@ function resolveOverrideValue(override, args, uploadedImageName) {
 
 function patchWorkflow(workflow, patchRules, args, uploadedImageName) {
   if (!patchRules || patchRules.workflow_ready !== true) {
-    throw new Error("Patch rules are not marked ready. Update side_projects/comfyui_video_lab/config/wan_i2v_patch_rules.json with real node ids, then set workflow_ready to true.");
+    throw new Error("Patch rules are not marked ready. Update config/wan_i2v_patch_rules.json with real node ids, then set workflow_ready to true.");
   }
   const patched = JSON.parse(JSON.stringify(workflow));
   const imageTarget = patchRules.uploaded_image_target || {};

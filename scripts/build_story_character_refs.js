@@ -5,9 +5,9 @@ const {
   buildExecutionResult,
   loadVisualGenerationConfig,
   resolveWorkflowTemplate
-} = require("../../../src/bricktoon/workflowContracts");
-const { withImageProvider } = require("../../../src/bricktoon/providers");
-const { validateGeneratedAsset } = require("../../../src/bricktoon/validateGeneratedAsset");
+} = require("../src/bricktoon/workflowContracts");
+const { withImageProvider } = require("../src/bricktoon/providers");
+const { validateGeneratedAsset } = require("../src/bricktoon/validateGeneratedAsset");
 const { LAB_ROOT, ensureDir, parseArgs, readJson, writeJson, writeText } = require("./lib");
 
 function slugify(value) {
@@ -84,7 +84,7 @@ function buildAnchorCrop(packageDir, pkg, character) {
   if (!preferred) {
     return null;
   }
-  const inputPath = path.join(path.resolve(__dirname, "..", "..", ".."), preferred.file);
+  const inputPath = path.join(path.resolve(__dirname, ".."), preferred.file);
   if (!fs.existsSync(inputPath)) {
     return null;
   }

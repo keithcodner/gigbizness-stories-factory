@@ -4,9 +4,9 @@ const {
   buildExecutionResult,
   loadVisualGenerationConfig,
   resolveWorkflowTemplate
-} = require("../../../src/bricktoon/workflowContracts");
-const { withImageProvider } = require("../../../src/bricktoon/providers");
-const { validateGeneratedAsset } = require("../../../src/bricktoon/validateGeneratedAsset");
+} = require("../src/bricktoon/workflowContracts");
+const { withImageProvider } = require("../src/bricktoon/providers");
+const { validateGeneratedAsset } = require("../src/bricktoon/validateGeneratedAsset");
 const { LAB_ROOT, REPO_ROOT, ensureDir, parseArgs, readJson, writeJson, writeText } = require("./lib");
 
 function slugify(value) {

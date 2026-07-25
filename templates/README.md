@@ -13,7 +13,7 @@ For the first investigation pass, create:
 3. Make sure it runs in the GUI first.
 4. Use the ComfyUI export option that saves the workflow in API JSON form.
 5. Save the exported file here as:
-   - `side_projects/comfyui_video_lab/templates/wan_i2v_api.json`
+   - `templates/wan_i2v_api.json`
 
 ## Important
 
@@ -21,11 +21,11 @@ For the first investigation pass, create:
 - After export, run:
 
 ```powershell
-npm run comfy:video:inspect -- --workflow side_projects/comfyui_video_lab/templates/wan_i2v_api.json
+node scripts/inspect_workflow.js --workflow templates/wan_i2v_api.json
 ```
 
 - Then copy the correct node ids into:
-  - `side_projects/comfyui_video_lab/config/wan_i2v_patch_rules.json`
+  - `config/wan_i2v_patch_rules.json`
 
 ## What The Patch Rules Need
 

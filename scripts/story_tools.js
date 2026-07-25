@@ -190,12 +190,23 @@ function parseScreenplay(markdown, options = {}) {
 }
 
 function readReferenceCatalog() {
-  const catalogPath = path.join(REPO_ROOT, "library", "reference_images", "reference_catalog.json");
-  if (!fs.existsSync(catalogPath)) {
-    return [];
+  const candidatePaths = [
+    path.join(REPO_ROOT, "library", "catalogs", "reference_catalog.json"),
+    path.join(REPO_ROOT, "library", "reference_images", "reference_catalog.json")
+  ];
+  for (const catalogPath of candidatePaths) {
+    if (!fs.existsSync(catalogPath)) {
+      continue;
+    }
+    const catalog = readJson(catalogPath);
+    if (Array.isArray(catalog.references)) {
+      return catalog.references;
+    }
+    if (Array.isArray(catalog.assets)) {
+      return catalog.assets;
+    }
   }
-  const catalog = readJson(catalogPath);
-  return Array.isArray(catalog.references) ? catalog.references : [];
+  return [];
 }
 
 function buildReferenceAnchors() {

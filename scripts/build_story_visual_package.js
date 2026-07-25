@@ -3,8 +3,8 @@ const path = require("path");
 const {
   loadVisualGenerationConfig,
   resolveWorkflowTemplate
-} = require("../../../src/bricktoon/workflowContracts");
-const { inferMotionRecipe } = require("../../../src/bricktoon/workflowContracts");
+} = require("../src/bricktoon/workflowContracts");
+const { inferMotionRecipe } = require("../src/bricktoon/workflowContracts");
 const { LAB_ROOT, REPO_ROOT, parseArgs, readJson, writeJson, writeText, ensureDir } = require("./lib");
 
 function slugify(value) {

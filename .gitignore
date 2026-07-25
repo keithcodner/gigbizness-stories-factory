@@ -2,12 +2,9 @@ node_modules/
 workspaces/
 topics/
 output/
-side_projects/comfyui_video_lab/input/*
-!side_projects/comfyui_video_lab/input/.gitkeep
-side_projects/comfyui_video_lab/output/*
-!side_projects/comfyui_video_lab/output/.gitkeep
-side_projects/comfyui_video_lab/reports/runtime/*
-!side_projects/comfyui_video_lab/reports/runtime/.gitkeep
+tmp/
+reports/runtime/*
+!reports/runtime/.gitkeep
 
 # Local runtime artifacts
 /output/logs/

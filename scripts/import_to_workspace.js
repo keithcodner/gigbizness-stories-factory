@@ -14,7 +14,7 @@ const {
   relativeWorkspacePath,
   saveManifest,
   upsertAsset
-} = require("../../../src/bricktoon/aiQualityPipeline");
+} = require("../src/bricktoon/aiQualityPipeline");
 
 function latestRuntimeReport() {
   const reportsDir = path.join(LAB_ROOT, "reports", "runtime");
