@@ -1,0 +1,121 @@
+{
+  "default_profile_id": "narrator_editorial",
+  "profiles": {
+    "narrator_editorial": {
+      "voice_preferences": [
+        "Microsoft Zira Desktop",
+        "Microsoft Hazel Desktop"
+      ],
+      "rate": "-6%",
+      "pitch": "-4%",
+      "volume": 100
+    },
+    "hero_fast": {
+      "voice_preferences": [
+        "Microsoft Hazel Desktop",
+        "Microsoft Zira Desktop"
+      ],
+      "rate": "+4%",
+      "pitch": "+6%",
+      "volume": 100
+    },
+    "villain_low": {
+      "voice_preferences": [
+        "Microsoft Zira Desktop",
+        "Microsoft Hazel Desktop"
+      ],
+      "rate": "-10%",
+      "pitch": "-18%",
+      "volume": 100
+    },
+    "kid_bright": {
+      "voice_preferences": [
+        "Microsoft Hazel Desktop",
+        "Microsoft Zira Desktop"
+      ],
+      "rate": "+10%",
+      "pitch": "+16%",
+      "volume": 100
+    },
+    "parent_grounded": {
+      "voice_preferences": [
+        "Microsoft Zira Desktop",
+        "Microsoft Hazel Desktop"
+      ],
+      "rate": "-2%",
+      "pitch": "-8%",
+      "volume": 100
+    },
+    "authority_crisp": {
+      "voice_preferences": [
+        "Microsoft Hazel Desktop",
+        "Microsoft Zira Desktop"
+      ],
+      "rate": "-1%",
+      "pitch": "-10%",
+      "volume": 100
+    },
+    "support_neutral": {
+      "voice_preferences": [
+        "Microsoft Zira Desktop",
+        "Microsoft Hazel Desktop"
+      ],
+      "rate": "0%",
+      "pitch": "0%",
+      "volume": 100
+    }
+  },
+  "archetype_rules": [
+    {
+      "match_any": [
+        "narrator"
+      ],
+      "profile_id": "narrator_editorial"
+    },
+    {
+      "match_any": [
+        "ceo",
+        "villain",
+        "greedy",
+        "evil"
+      ],
+      "profile_id": "villain_low"
+    },
+    {
+      "match_any": [
+        "12-year-old",
+        "kid",
+        "child",
+        "builder"
+      ],
+      "profile_id": "kid_bright"
+    },
+    {
+      "match_any": [
+        "police",
+        "officer",
+        "authority"
+      ],
+      "profile_id": "authority_crisp"
+    },
+    {
+      "match_any": [
+        "father",
+        "mother",
+        "dad",
+        "mom",
+        "parent"
+      ],
+      "profile_id": "parent_grounded"
+    },
+    {
+      "match_any": [
+        "youtuber",
+        "investigates",
+        "hero",
+        "host"
+      ],
+      "profile_id": "hero_fast"
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "checked_at": "2026-07-24T15:57:55.868Z",
+  "base_url": "http://127.0.0.1:8188",
+  "comfyui_version": "0.27.0",
+  "pytorch_version": null,
+  "device_name": "cuda:0 NVIDIA GeForce GTX 1080 : cudaMallocAsync",
+  "raw": {
+    "system": {
+      "os": "win32",
+      "ram_total": 68625690624,
+      "ram_free": 29205397504,
+      "comfyui_version": "0.27.0",
+      "required_frontend_version": "1.45.20",
+      "installed_templates_version": "0.11.9",
+      "required_templates_version": "0.11.9",
+      "comfy_package_versions": [
+        {
+          "name": "comfyui-frontend-package",
+          "installed": "1.45.20",
+          "required": "1.45.20"
+        },
+        {
+          "name": "comfyui-workflow-templates",
+          "installed": "0.11.9",
+          "required": "0.11.9"
+        },
+        {
+          "name": "comfyui-embedded-docs",
+          "installed": "0.5.8",
+          "required": "0.5.8"
+        },
+        {
+          "name": "comfy-kitchen",
+          "installed": "0.2.20",
+          "required": "0.2.20"
+        },
+        {
+          "name": "comfy-aimdo",
+          "installed": "0.4.10",
+          "required": "0.4.10"
+        }
+      ],
+      "python_version": "3.10.11 (tags/v3.10.11:7d4cc5a, Apr  5 2023, 00:38:17) [MSC v.1929 64 bit (AMD64)]",
+      "pytorch_version": "2.7.1+cu118",
+      "embedded_python": false,
+      "deploy_environment": "local-git",
+      "argv": [
+        "C:\\AI\\ComfyUI-GTX1080\\main.py",
+        "--listen",
+        "127.0.0.1",
+        "--port",
+        "8188"
+      ]
+    },
+    "devices": [
+      {
+        "name": "cuda:0 NVIDIA GeForce GTX 1080 : cudaMallocAsync",
+        "type": "cuda",
+        "index": 0,
+        "vram_total": 8589672448,
+        "vram_free": 7487750144,
+        "torch_vram_total": 33554432,
+        "torch_vram_free": 25034752
+      }
+    ]
+  }
+}
