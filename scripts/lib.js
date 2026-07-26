@@ -197,7 +197,9 @@ function patchWorkflow(workflow, patchRules, args, uploadedImageName) {
   }
   const patched = JSON.parse(JSON.stringify(workflow));
   const imageTarget = patchRules.uploaded_image_target || {};
-  setNodeInput(patched, String(imageTarget.node_id), String(imageTarget.input_name), uploadedImageName);
+  if (imageTarget.node_id != null && imageTarget.input_name != null) {
+    setNodeInput(patched, String(imageTarget.node_id), String(imageTarget.input_name), uploadedImageName);
+  }
 
   for (const override of patchRules.input_overrides || []) {
     const resolvedValue = resolveOverrideValue(override, args, uploadedImageName);

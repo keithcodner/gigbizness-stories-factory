@@ -1,0 +1,28 @@
+{
+  "profile_id": "gtx1080_standard16_v1",
+  "label": "GTX 1080 Standard 16-Frame Motion",
+  "gpu_target": "NVIDIA GeForce GTX 1080 8GB",
+  "workflow_template": "templates/wan_i2v_api.json",
+  "patch_rules": "config/wan_i2v_patch_rules.json",
+  "base_url_candidates": [
+    "http://127.0.0.1:8194",
+    "http://127.0.0.1:8188",
+    "http://127.0.0.1:8191"
+  ],
+  "recommended_args": {
+    "width": 576,
+    "height": 320,
+    "frames": 16,
+    "fps": 8,
+    "timeout_ms": 1800000,
+    "poll_interval_ms": 5000
+  },
+  "notes": [
+    "This is the standard proof profile for GTX 1080 preview-safe motion renders.",
+    "Use this for the first repeatable render proof before moving to longer clips or higher resolutions.",
+    "Apply frame interpolation after approval rather than during this first-pass render."
+  ],
+  "proof_assets": [
+    "output/gtx1080_bricktoon_test_detached_1785046814962/bricktoon_wan_i2v_preview_00001.mp4"
+  ]
+}

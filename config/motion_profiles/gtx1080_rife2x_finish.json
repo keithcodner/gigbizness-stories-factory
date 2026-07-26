@@ -1,0 +1,30 @@
+{
+  "profile_id": "gtx1080_rife2x_finish_v1",
+  "kind": "motion_finish",
+  "base_url_candidates": [
+    "http://127.0.0.1:8194",
+    "http://127.0.0.1:8188",
+    "http://127.0.0.1:8191"
+  ],
+  "workflow_template": "templates/video_interpolate_api.json",
+  "patch_rules": "config/video_interpolate_patch_rules.json",
+  "recommended_args": {
+    "model_name": "rife49.pth",
+    "multiplier": 2,
+    "source_fps": 8,
+    "output_fps": 16,
+    "cache_window": 8,
+    "fast_mode": true,
+    "ensemble": false,
+    "scale_factor": 1,
+    "dtype": "float32",
+    "batch_size": 1,
+    "timeout_ms": 1200000,
+    "poll_interval_ms": 5000
+  },
+  "operator_notes": [
+    "Use this only after the base motion clip is approved.",
+    "RIFE 2x is the safest quality-to-runtime finish pass for the GTX 1080 stack.",
+    "Keep multiplier at 2 for the current GPU unless a shot is unusually short and simple."
+  ]
+}

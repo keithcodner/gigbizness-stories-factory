@@ -1,0 +1,28 @@
+{
+  "profile_id": "gtx1080_fast8_v1",
+  "label": "GTX 1080 Fast 8-Frame Motion",
+  "gpu_target": "NVIDIA GeForce GTX 1080 8GB",
+  "workflow_template": "templates/wan_i2v_api.json",
+  "patch_rules": "config/wan_i2v_patch_rules.json",
+  "base_url_candidates": [
+    "http://127.0.0.1:8194",
+    "http://127.0.0.1:8188",
+    "http://127.0.0.1:8191"
+  ],
+  "recommended_args": {
+    "width": 512,
+    "height": 288,
+    "frames": 8,
+    "fps": 8,
+    "timeout_ms": 600000,
+    "poll_interval_ms": 5000
+  },
+  "notes": [
+    "Use this profile first for proof renders on the GTX 1080.",
+    "The 8-frame 512x288 profile completes faster for iteration and server smoke checks.",
+    "Apply frame interpolation after preview approval rather than during first-pass generation."
+  ],
+  "proof_assets": [
+    "output/gtx1080_bricktoon_test_smallproof_1785047066815/bricktoon_wan_i2v_preview_00002.mp4"
+  ]
+}

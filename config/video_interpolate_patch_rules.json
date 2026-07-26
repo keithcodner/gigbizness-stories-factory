@@ -1,0 +1,98 @@
+{
+  "workflow_id": "gtx1080_bricktoon_rife_finish_v1",
+  "workflow_ready": true,
+  "description": "GTX 1080-friendly post-render interpolation workflow using VHS path loading, RIFE VFI, and VideoHelperSuite output assembly.",
+  "input_overrides": [
+    {
+      "node_id": "1",
+      "input_name": "video",
+      "source": "arg",
+      "arg_name": "videoPath",
+      "default": ""
+    },
+    {
+      "node_id": "1",
+      "input_name": "force_rate",
+      "source": "arg",
+      "arg_name": "sourceFps",
+      "default": 8
+    },
+    {
+      "node_id": "2",
+      "input_name": "ckpt_name",
+      "source": "arg",
+      "arg_name": "modelName",
+      "default": "rife49.pth"
+    },
+    {
+      "node_id": "2",
+      "input_name": "clear_cache_after_n_frames",
+      "source": "arg",
+      "arg_name": "cacheWindow",
+      "default": 8
+    },
+    {
+      "node_id": "2",
+      "input_name": "multiplier",
+      "source": "arg",
+      "arg_name": "multiplier",
+      "default": 2
+    },
+    {
+      "node_id": "2",
+      "input_name": "fast_mode",
+      "source": "arg",
+      "arg_name": "fastMode",
+      "default": true
+    },
+    {
+      "node_id": "2",
+      "input_name": "ensemble",
+      "source": "arg",
+      "arg_name": "ensemble",
+      "default": false
+    },
+    {
+      "node_id": "2",
+      "input_name": "scale_factor",
+      "source": "arg",
+      "arg_name": "scaleFactor",
+      "default": 1
+    },
+    {
+      "node_id": "2",
+      "input_name": "dtype",
+      "source": "arg",
+      "arg_name": "dtype",
+      "default": "float32"
+    },
+    {
+      "node_id": "2",
+      "input_name": "torch_compile",
+      "source": "arg",
+      "arg_name": "torchCompile",
+      "default": false
+    },
+    {
+      "node_id": "2",
+      "input_name": "batch_size",
+      "source": "arg",
+      "arg_name": "batchSize",
+      "default": 1
+    },
+    {
+      "node_id": "3",
+      "input_name": "frame_rate",
+      "source": "arg",
+      "arg_name": "outputFps",
+      "default": 16
+    },
+    {
+      "node_id": "3",
+      "input_name": "filename_prefix",
+      "source": "arg",
+      "arg_name": "filenamePrefix",
+      "default": "bricktoon_motion_interpolated"
+    }
+  ]
+}

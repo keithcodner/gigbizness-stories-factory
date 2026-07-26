@@ -19,7 +19,6 @@ async function runWorkflow(options = {}) {
   const baseUrl = options.baseUrl || process.env.COMFYUI_BASE_URL || "http://127.0.0.1:8188";
   const workflowPath = path.resolve(options.workflow || path.join(LAB_ROOT, "templates", "wan_i2v_api.json"));
   const patchPath = path.resolve(options.patch || path.join(LAB_ROOT, "config", "wan_i2v_patch_rules.json"));
-  const inputPath = path.resolve(options.input || path.join(LAB_ROOT, "input", "test_story_template_source.png"));
   const timeoutMs = Number(options.timeoutMs || process.env.COMFYUI_VIDEO_TIMEOUT_MS || 900000);
   const pollIntervalMs = Number(options.pollIntervalMs || process.env.COMFYUI_VIDEO_POLL_INTERVAL_MS || 5000);
   const runLabel = String(options.label || `wan_i2v_${Date.now()}`);
@@ -30,15 +29,23 @@ async function runWorkflow(options = {}) {
   if (!fs.existsSync(patchPath)) {
     throw new Error(`Patch rules file not found: ${patchPath}`);
   }
-  if (!fs.existsSync(inputPath)) {
-    throw new Error(`Input image not found: ${inputPath}`);
-  }
 
   await apiJson(baseUrl, "/system_stats");
 
   const workflow = readJson(workflowPath);
   const patchRules = readJson(patchPath);
-  const uploadedImageName = await uploadInputImage(baseUrl, inputPath);
+  const needsUploadedImage = patchRules.uploaded_image_target?.node_id != null && patchRules.uploaded_image_target?.input_name != null;
+  const inputPath = options.input != null
+    ? path.resolve(options.input)
+    : (needsUploadedImage ? path.join(LAB_ROOT, "input", "test_story_template_source.png") : null);
+
+  if (needsUploadedImage) {
+    if (!inputPath || !fs.existsSync(inputPath)) {
+      throw new Error(`Input image not found: ${inputPath}`);
+    }
+  }
+
+  const uploadedImageName = needsUploadedImage ? await uploadInputImage(baseUrl, inputPath) : undefined;
   const patchedWorkflow = patchWorkflow(workflow, patchRules, options, uploadedImageName);
 
   const runId = `${runLabel}_${Date.now()}`;
@@ -69,7 +76,7 @@ async function runWorkflow(options = {}) {
     workflow_path: workflowPath,
     patch_rules_path: patchPath,
     input_path: inputPath,
-    uploaded_image_name: uploadedImageName,
+    uploaded_image_name: uploadedImageName || null,
     prompt_id: promptId,
     output_dir: outputDir,
     downloaded_assets: downloaded,
