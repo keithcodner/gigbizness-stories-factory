@@ -65,6 +65,8 @@ Key directories:
 
 Implementation tracking lives in [docs/IMPLEMENTATION_ROOT_PROMOTION.md](/C:/xampp/htdocs/apps/gigbizness-stories-factory/docs/IMPLEMENTATION_ROOT_PROMOTION.md).
 
+Current visual pipeline and ComfyUI node-stack status lives in [docs/technical_docs/VISUAL_PIPELINE_STATUS.md](/C:/xampp/htdocs/apps/gigbizness-stories-factory/docs/technical_docs/VISUAL_PIPELINE_STATUS.md), and prompt-by-prompt repo changes are tracked in [docs/reports/PROMPT_CHANGELOG.md](/C:/xampp/htdocs/apps/gigbizness-stories-factory/docs/reports/PROMPT_CHANGELOG.md).
+
 ## Notes
 
 - All important paths resolve relative to the repository root.

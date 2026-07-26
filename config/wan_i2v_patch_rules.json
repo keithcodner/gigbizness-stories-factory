@@ -1,56 +1,56 @@
 {
-  "workflow_id": "wan_i2v_native_preview",
-  "workflow_ready": false,
-  "description": "Replace the placeholder node ids after exporting the real ComfyUI API workflow. Keep workflow_ready=false until the mapping is real.",
+  "workflow_id": "gtx1080_bricktoon_ipadapter_animatediff_preview_v1",
+  "workflow_ready": true,
+  "description": "GTX 1080-friendly Bricktoon motion preview workflow using SD1.5 + IPAdapter + AnimateDiff + VideoHelperSuite. Designed for short, low-cost preview clips before heavier rendering.",
   "uploaded_image_target": {
-    "node_id": "REPLACE_ME",
+    "node_id": "4",
     "input_name": "image"
   },
   "input_overrides": [
     {
-      "node_id": "REPLACE_ME",
-      "input_name": "prompt",
+      "node_id": "2",
+      "input_name": "text",
       "source": "arg",
       "arg_name": "prompt",
-      "default": "subtle premium bricktoon motion, toy-brick editorial style, cinematic movement, no text, no watermark"
+      "default": "premium bricktoon still brought to life, subtle cinematic camera motion, toy-plastic editorial style, expressive face, clean readable silhouette, no text, no watermark"
     },
     {
-      "node_id": "REPLACE_ME",
-      "input_name": "negative_prompt",
+      "node_id": "3",
+      "input_name": "text",
       "source": "arg",
       "arg_name": "negativePrompt",
-      "default": "text, watermark, logo, blurry face, malformed hands, extra limbs, duplicate character"
+      "default": "text, watermark, logo, blurry face, malformed hands, extra limbs, duplicate character, photoreal human skin, realistic pores, speech bubble, title card"
     },
     {
-      "node_id": "REPLACE_ME",
+      "node_id": "5",
       "input_name": "width",
       "source": "arg",
       "arg_name": "width",
-      "default": 832
+      "default": 576
     },
     {
-      "node_id": "REPLACE_ME",
+      "node_id": "5",
       "input_name": "height",
       "source": "arg",
       "arg_name": "height",
-      "default": 480
+      "default": 320
     },
     {
-      "node_id": "REPLACE_ME",
-      "input_name": "frames",
+      "node_id": "5",
+      "input_name": "batch_size",
       "source": "arg",
       "arg_name": "frames",
-      "default": 49
+      "default": 16
     },
     {
-      "node_id": "REPLACE_ME",
-      "input_name": "fps",
+      "node_id": "14",
+      "input_name": "frame_rate",
       "source": "arg",
       "arg_name": "fps",
-      "default": 12
+      "default": 8
     },
     {
-      "node_id": "REPLACE_ME",
+      "node_id": "12",
       "input_name": "seed",
       "source": "arg",
       "arg_name": "seed",

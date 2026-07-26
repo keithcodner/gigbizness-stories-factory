@@ -1,0 +1,174 @@
+{
+  "1": {
+    "inputs": {
+      "ckpt_name": "realisticVisionV60B1_v51HyperVAE-small.safetensors"
+    },
+    "class_type": "CheckpointLoaderSimple"
+  },
+  "2": {
+    "inputs": {
+      "text": "premium bricktoon character, cinematic toy-plastic lighting, expressive face, clean composition, editorial animation frame",
+      "clip": [
+        "1",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode"
+  },
+  "3": {
+    "inputs": {
+      "text": "text, watermark, logo, blurry face, malformed hands, extra limbs, duplicate character, photoreal human skin, realistic pores, speech bubble, title card",
+      "clip": [
+        "1",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode"
+  },
+  "4": {
+    "inputs": {
+      "image": "REPLACE_WITH_UPLOADED_IMAGE.png"
+    },
+    "class_type": "LoadImage"
+  },
+  "5": {
+    "inputs": {
+      "width": 576,
+      "height": 320,
+      "batch_size": 16
+    },
+    "class_type": "EmptyLatentImage"
+  },
+  "6": {
+    "inputs": {
+      "model": [
+        "1",
+        0
+      ],
+      "preset": "PLUS (high strength)"
+    },
+    "class_type": "IPAdapterUnifiedLoader"
+  },
+  "7": {
+    "inputs": {
+      "model": [
+        "6",
+        0
+      ],
+      "ipadapter": [
+        "6",
+        1
+      ],
+      "image": [
+        "4",
+        0
+      ],
+      "weight": 0.72,
+      "weight_type": "linear",
+      "combine_embeds": "concat",
+      "start_at": 0,
+      "end_at": 0.82,
+      "embeds_scaling": "V only"
+    },
+    "class_type": "IPAdapterAdvanced"
+  },
+  "8": {
+    "inputs": {
+      "model_name": "mm_sd_v15_v2.ckpt"
+    },
+    "class_type": "ADE_LoadAnimateDiffModel"
+  },
+  "9": {
+    "inputs": {
+      "motion_model": [
+        "8",
+        0
+      ]
+    },
+    "class_type": "ADE_ApplyAnimateDiffModelSimple"
+  },
+  "10": {
+    "inputs": {
+      "context_length": 16,
+      "context_overlap": 4,
+      "fuse_method": "pyramid",
+      "use_on_equal_length": true,
+      "start_percent": 0,
+      "guarantee_steps": 1
+    },
+    "class_type": "ADE_StandardStaticContextOptions"
+  },
+  "11": {
+    "inputs": {
+      "model": [
+        "7",
+        0
+      ],
+      "beta_schedule": "autoselect",
+      "m_models": [
+        "9",
+        0
+      ],
+      "context_options": [
+        "10",
+        0
+      ]
+    },
+    "class_type": "ADE_UseEvolvedSampling"
+  },
+  "12": {
+    "inputs": {
+      "model": [
+        "11",
+        0
+      ],
+      "seed": 123456789,
+      "steps": 18,
+      "cfg": 6.5,
+      "sampler_name": "euler",
+      "scheduler": "normal",
+      "positive": [
+        "2",
+        0
+      ],
+      "negative": [
+        "3",
+        0
+      ],
+      "latent_image": [
+        "5",
+        0
+      ],
+      "denoise": 1
+    },
+    "class_type": "KSampler"
+  },
+  "13": {
+    "inputs": {
+      "samples": [
+        "12",
+        0
+      ],
+      "vae": [
+        "1",
+        2
+      ]
+    },
+    "class_type": "VAEDecode"
+  },
+  "14": {
+    "inputs": {
+      "images": [
+        "13",
+        0
+      ],
+      "frame_rate": 8,
+      "loop_count": 0,
+      "pingpong": false,
+      "filename_prefix": "bricktoon_wan_i2v_preview",
+      "format": "video/h264-mp4",
+      "save_output": true
+    },
+    "class_type": "VHS_VideoCombine"
+  }
+}
