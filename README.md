@@ -17,6 +17,56 @@ npm run library:catalog
 npm run story:preview -- --topic the_great_brick_heist
 ```
 
+## Bootstrap a fresh Windows machine
+
+From the repository root, run:
+
+```powershell
+scripts\setup-environment.ps1
+```
+
+This script will:
+
+- copy `.env.example` to `.env` if needed
+- create `workspaces/` if missing
+- detect `node`, `python`, and `ffmpeg`
+- install `ffmpeg` automatically via `winget` when available
+
+After bootstrapping, validate the repo with:
+
+```powershell
+npm run system:check
+```
+
+For a fully configured live visual workflow, set `COMFYUI_BASE_URL` in `.env` and ensure your ComfyUI server is running.
+
+### Install the documented GTX 1080 ComfyUI integration
+
+The repository's supported Windows layout is `C:\AI\ComfyUI-GTX1080`. The
+installation lives on the C drive and executes CUDA workloads on the graphics
+card; software cannot be installed directly onto GPU memory.
+
+From an elevated PowerShell terminal in the repository root, run:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\install-comfyui-gtx1080.ps1
+```
+
+The installer follows the stack recorded in
+`docs/technical_docs/VISUAL_PIPELINE_STATUS.md`: Python 3.11, PyTorch
+`2.7.1+cu118`, IPAdapter, Advanced ControlNet, VideoHelperSuite, AnimateDiff
+Evolved, Frame Interpolation, and the named support models. It is safe to
+rerun and does not replace existing models.
+
+The final SD 1.5 checkpoint is license-dependent and is not downloaded
+automatically. Put the checkpoint named by `COMFYUI_CHECKPOINT` in
+`C:\AI\ComfyUI-GTX1080\models\checkpoints`, then start and check the service:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\start-comfyui.ps1
+npm run comfyui:check
+```
+
 That command sequence will:
 
 - validate environment and folder readiness

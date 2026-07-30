@@ -8,6 +8,13 @@
   },
   "input_overrides": [
     {
+      "node_id": "1",
+      "input_name": "ckpt_name",
+      "source": "env",
+      "env_name": "COMFYUI_CHECKPOINT",
+      "default": "realisticVisionV60B1_v51HyperVAE-small.safetensors"
+    },
+    {
       "node_id": "2",
       "input_name": "text",
       "source": "arg",

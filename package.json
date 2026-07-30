@@ -15,6 +15,7 @@
     "motion:proof:fast": "node scripts/motion-proof.js --profile gtx1080_preview",
     "motion:proof:standard": "node scripts/motion-proof.js --profile gtx1080_standard16",
     "motion:finish": "node scripts/motion-finish.js",
+    "comfyui:check": "node scripts/check_comfyui.js",
     "story:assemble": "node scripts/story-assemble.js",
     "story:review": "node scripts/story-review.js",
     "story:finish": "node scripts/story-finish.js",
