@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-07-30",
+  "policy": {
+    "default_status": "candidate",
+    "promotion_rule": "Promote a candidate to active after it improves a rendered sample and passes visual review.",
+    "retirement_rule": "Mark superseded rules retired; do not delete their evidence or history."
+  },
+  "learnings": [
+    {
+      "id": "environment_locked_plate_v1",
+      "status": "active",
+      "title": "Lock the environment by scene and camera setup",
+      "applies_to": ["image_request", "character_pose", "motion_render"],
+      "directive": "Reuse one approved environment plate. Preserve prop inventory, prop positions, set geometry, lighting, and camera pose. Create a new plate only for a scene change, deliberate camera setup change, or explicit environment-changing story event.",
+      "implementation": "Render the character separately with transparency and composite it onto the approved plate before interpolation.",
+      "evidence": "SCENE_01_MS_04 environment-locked walking sample",
+      "validation": "A multi-frame review must show the same background props and layout throughout the shot."
+    },
+    {
+      "id": "character_alpha_layer_v1",
+      "status": "active",
+      "title": "Animate characters independently from the set",
+      "applies_to": ["character_pose", "motion_render"],
+      "directive": "Generate matched character poses as transparent layers with stable identity, wardrobe, scale, lighting direction, and screen position.",
+      "implementation": "Composite transparent poses over the locked plate before RIFE or other frame interpolation; avoid chroma keying when alpha is available.",
+      "evidence": "Clean Maya walking sprites and environment-locked v2 sample",
+      "validation": "Character edges must have no chroma fringe, and distant environment pixels must not be regenerated."
+    },
+    {
+      "id": "three_pose_walk_cycle_v1",
+      "status": "retired",
+      "title": "Build walking from three matched key poses",
+      "applies_to": ["walk_cycle"],
+      "directive": "Use contact A, passing, and contact B, then reverse the interpolated step for a loop.",
+      "implementation": "Historical three-pose forward/reverse implementation.",
+      "evidence": "SCENE_01_MS_04 Attempts 001 and 002 showed consistent identity but repeated the same leading foot.",
+      "validation": "Rejected: reversing one step produces rocking rather than alternating support.",
+      "retired_reason": "Biomechanically incomplete because the opposite-leg half-step is absent.",
+      "superseded_by": "eight_phase_walk_cycle_v2"
+    },
+    {
+      "id": "eight_phase_walk_cycle_v2",
+      "status": "candidate",
+      "title": "Build walking from a complete alternating gait",
+      "applies_to": ["walk_cycle"],
+      "directive": "Use contact, down, passing, and up for the near-leg half-step, followed by contact, down, passing, and up for the far-leg half-step. Interpolate the final pose back to the first; never reverse one half-step to fake the other.",
+      "implementation": "Use eight source poses per second and deterministic key-pose holds at 24 fps until adjacent poses are rig-consistent. Preserve the locked environment and loop only to the voice duration.",
+      "evidence": "SCENE_01_MS_04 Attempt 004 showed RIFE anatomy deformation; Attempt 005 preserved clean anatomy with deterministic key-pose timing; Attempt 006 showed optical-flow double faces, transparent limbs, and motion trails.",
+      "validation": "Approve only after alternating planted feet, opposite arm swing, vertical weight transfer, limited foot sliding, clean anatomy in every delivery frame, stable identity, and a clean loop boundary all pass."
+    },
+    {
+      "id": "grounded_character_travel_v1",
+      "status": "candidate",
+      "title": "Anchor walking characters to the floor and move them through the set",
+      "applies_to": ["walk_cycle", "motion_render"],
+      "directive": "Normalize each transparent pose by its visible alpha bounds, anchor the lowest foot to one shared floor coordinate, keep the environment plate fixed, and translate the character layer horizontally at a speed matched to the gait.",
+      "implementation": "Build an alpha-preserving pose cycle, overlay it on the locked plate at the configured ground line, and advance its x position continuously for the full voice duration.",
+      "evidence": "SCENE_01_MS_04 Attempt 005 exposed varying pose bottoms and camera-only movement that made Maya appear to float in place. Attempt 007 aligned alpha bounds to a shared floor line and moved Maya continuously across the locked set.",
+      "validation": "Every support phase must contact the same floor line; the character must advance across the set without background regeneration, per-cycle position resets, or visible hovering."
+    },
+    {
+      "id": "natural_voice_finish_v1",
+      "status": "active",
+      "title": "Finish voice before scene assembly",
+      "applies_to": ["voice", "scene_assembly"],
+      "directive": "Use phrase-aware pacing, restrained pitch and rate changes, light equalization and compression, and 48 kHz delivery audio.",
+      "implementation": "Generate voice segments through the repository voice-preview pipeline and attach the matching micro-scene segment during final assembly.",
+      "evidence": "SCENE_01_MS_04 polished Maya voice segment",
+      "validation": "Check phrasing, pauses, intelligibility, peak control, and synchronization with the scene duration."
+    },
+    {
+      "id": "multi_frame_visual_review_v1",
+      "status": "active",
+      "title": "Review motion across the entire shot",
+      "applies_to": ["quality_control"],
+      "directive": "Inspect a contact sheet sampled across the rendered clip before approving a reusable motion or continuity pattern.",
+      "implementation": "Compare the beginning, transitions, and ending for identity drift, prop drift, edge artifacts, gait discontinuities, and unintended camera changes.",
+      "evidence": "SCENE_01_MS_04 seven-frame environment continuity review",
+      "validation": "Record the reviewed output and only promote patterns that pass."
+    }
+  ]
+}

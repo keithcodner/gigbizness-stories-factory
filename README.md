@@ -6,10 +6,11 @@ The repo is structured so a fresh clone can package a story, create voice previe
 
 ## Quickstart
 
-1. Copy `.env.example` to `.env` and fill in any machine-specific values.
-2. Confirm machine dependencies are installed:
+1. Activate the repository's Node.js version with `nvm use`.
+2. Copy `.env.example` to `.env` and fill in any machine-specific values.
+3. Confirm machine dependencies are installed:
    `node`, `python`, `ffmpeg`, and optionally ComfyUI for live image generation.
-3. Run:
+4. Run:
 
 ```bash
 npm run system:check
@@ -92,6 +93,46 @@ npm run story:assemble -- --topic the_great_brick_heist
 npm run story:review -- --topic the_great_brick_heist
 npm run story:finish -- --topic the_great_brick_heist
 ```
+
+## Reference-Driven Scene Sample
+
+Reference images in `library/reference_images` are cataloged as source material, then cropped and cleaned into reusable character assets before any scene is rendered. Do not condition final scenes directly on the original headline/brand-heavy images.
+
+The following creates a Maya dialogue proof from the Scene 1 script:
+
+```powershell
+nvm use
+npm run library:catalog
+node scripts/build_story_package.js --story the_great_brick_heist_scene_01 --output-id the_great_brick_heist_scene_sample
+node scripts/run_story_preview.js --story the_great_brick_heist_scene_01 --output-id the_great_brick_heist_scene_sample
+node scripts/build_story_character_refs.js --package output/story_packages/the_great_brick_heist_scene_sample/story_package.json --characters MAYA
+node scripts/build_story_visual_package.js --package output/story_packages/the_great_brick_heist_scene_sample/story_package.json
+node scripts/render_story_visuals.js --package output/story_packages/the_great_brick_heist_scene_sample/story_package.json --micro-scenes SCENE_01_MS_04 --force --stop-on-error
+npm run motion:proof:fast -- --input output/story_packages/the_great_brick_heist_scene_sample/visual_package/generated_frames/SCENE_01_MS_04.png --label scene_01_ms_04_voice_sample
+npm run scene-sample:finish -- --story the_great_brick_heist_scene_sample --micro-scene SCENE_01_MS_04
+```
+
+The reusable Maya library is written under `visual_package/character_refs/maya`. The final voiced proof is written under `scene_sample`. This proof uses real motion plus voice-over; it intentionally does not claim lip sync. A later mouth/viseme pass should use the clean talking-expression asset.
+
+For smoother, identity-safe dialogue animation, render two approved key poses with matching framing and run:
+
+```powershell
+npm run scene:performance -- --story the_great_brick_heist_scene_sample --micro-scene SCENE_01_MS_04 --start output/story_packages/the_great_brick_heist_scene_sample/visual_package/generated_frames/SCENE_01_MS_04.png --end output/story_packages/the_great_brick_heist_scene_sample/visual_package/generated_frames/SCENE_01_MS_04_gesture.png
+```
+
+This reusable GTX 1080 profile interpolates the poses, applies a second smoothing pass, adds a controlled camera push, and assembles the matching polished voice segment.
+
+Walking scenes use three matched poses—contact A, passing, and contact B:
+
+```powershell
+npm run scene:walk -- --story the_great_brick_heist_scene_sample --micro-scene SCENE_01_MS_04 --environment output/story_packages/the_great_brick_heist_scene_sample/visual_package/environments/scene_01_basement/camera_a/environment_plate.png --poses output/story_packages/the_great_brick_heist_scene_sample/visual_package/character_refs/maya/walking_gait_v3/canvas/contact_near.png,output/story_packages/the_great_brick_heist_scene_sample/visual_package/character_refs/maya/walking_gait_v3/canvas/down_near.png,output/story_packages/the_great_brick_heist_scene_sample/visual_package/character_refs/maya/walking_gait_v3/canvas/passing_far.png,output/story_packages/the_great_brick_heist_scene_sample/visual_package/character_refs/maya/walking_gait_v3/canvas/up_far.png,output/story_packages/the_great_brick_heist_scene_sample/visual_package/character_refs/maya/walking_gait_v3/canvas/contact_far.png,output/story_packages/the_great_brick_heist_scene_sample/visual_package/character_refs/maya/walking_gait_v3/canvas/down_far.png,output/story_packages/the_great_brick_heist_scene_sample/visual_package/character_refs/maya/walking_gait_v3/canvas/passing_near.png,output/story_packages/the_great_brick_heist_scene_sample/visual_package/character_refs/maya/walking_gait_v3/canvas/up_near.png
+```
+
+This uses a complete eight-phase gait rather than reversing one three-pose step. It composites the transparent poses onto the unchanged approved environment plate before interpolation, producing a 24 fps identity-locked walking cycle without regenerated props or chroma-key edges. It loops only to the dialogue duration, applies a gentle tracking move, and attaches the polished voice. Reuse the same plate for every shot in the same scene and camera setup. Generate a new plate only for a scene change, a deliberate camera setup change, or an explicit story event that changes the environment.
+
+Reusable rendering discoveries are tracked in `config/rendering_learnings.json` and explained in `docs/technical_docs/RENDERING_PLAYBOOK.md`. Active entries are embedded in future visual requests. Record a newly observed rule as a candidate with `npm run rendering:learn`; promote it to `active` only after a rendered sample passes multi-frame review.
+
+Animation iterations are preserved in separate numbered folders under the story package's `animation_experiments` directory. `scene:walk` automatically creates the next candidate folder with its pose inputs, render, review sheet, hypothesis, and manifest. Use `npm run animation:attempt` to record additional manual experiments.
 
 Use `npm run story:status -- --topic the_great_brick_heist` to inspect stage state, and `npm run story:resume -- --topic the_great_brick_heist` to continue from the first incomplete stage.
 

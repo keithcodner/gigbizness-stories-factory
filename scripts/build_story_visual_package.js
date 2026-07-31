@@ -51,6 +51,15 @@ function loadVoiceTiming(packageDir) {
   return new Map((manifest.segments || []).map((segment) => [segment.micro_scene_id, segment]));
 }
 
+function loadActiveRenderingLearnings() {
+  const registryPath = path.join(REPO_ROOT, "config", "rendering_learnings.json");
+  if (!fs.existsSync(registryPath)) {
+    return [];
+  }
+  return (readJson(registryPath).learnings || [])
+    .filter((learning) => learning.status === "active");
+}
+
 function loadStoryCharacterRefIndex(packageDir, character) {
   const characterSlug = slugify(character.id || character.name);
   const indexPath = path.join(packageDir, "visual_package", "character_refs", characterSlug, "index.json");
@@ -299,7 +308,7 @@ function referencesForMicroScene(packageDir, pkg, microScene, characters) {
   return references;
 }
 
-function promptForMicroScene(pkg, scene, microScene, characters, references) {
+function promptForMicroScene(pkg, scene, microScene, characters, references, renderingLearnings = []) {
   const sceneTitle = scene?.title || microScene.scene_id;
   const location = scene?.location || "";
   const lead = characters[0] || null;
@@ -328,6 +337,10 @@ function promptForMicroScene(pkg, scene, microScene, characters, references) {
     `Frame format: one film-frame style image from an animated scene, not a YouTube thumbnail, not a poster, not a comic cover, not an infographic, and not a meme layout.`,
     `Do not place any speech bubbles, captions, titles, logos, storefront signs, UI blocks, or readable text anywhere in the frame.`,
     `Motion-prep framing: preserve clean face, mouth, eye, hand, and prop zones for later blink, mouth, gesture, and prop animation.`,
+    `Environment continuity: reuse the approved plate for this scene and camera setup. Do not regenerate, replace, move, add, or remove background props unless the story beat explicitly changes the set.`,
+    ...renderingLearnings
+      .filter((learning) => (learning.applies_to || []).includes("image_request"))
+      .map((learning) => `Rendering rule ${learning.id}: ${learning.directive}`),
     anchorSummary ? `Reference anchor traits: ${anchorSummary}.` : "",
     avoidSummary ? `Reference avoidance rules: ${avoidSummary}.` : "",
     visibleCount === 0 ? "Visible subject count: zero people. No faces, no crowd, no background characters." : "",
@@ -462,6 +475,7 @@ function buildVisualPackage(options = {}) {
   const config = loadVisualGenerationConfig();
   const storyRenderProfile = loadStoryRenderProfile(config, options);
   const voiceTiming = loadVoiceTiming(packageDir);
+  const renderingLearnings = loadActiveRenderingLearnings();
   const requests = [];
   const sceneMap = new Map();
   const outputOverrides = storyRenderProfile.config?.output || {};
@@ -482,6 +496,16 @@ function buildVisualPackage(options = {}) {
       const references = referencesForMicroScene(packageDir, pkg, microScene, visibleCharacters);
       const voiceSegment = voiceTiming.get(microScene.micro_scene_id) || null;
       const motionBlueprint = buildMotionBlueprint(microScene, voiceSegment, workflowSelection);
+      const learningScopes = new Set(["image_request", "motion_render"]);
+      if (visibleCharacters.length > 0) {
+        learningScopes.add("character_pose");
+      }
+      if (/\bwalk(?:ing|s|ed)?\b/i.test(JSON.stringify(motionBlueprint))) {
+        learningScopes.add("walk_cycle");
+      }
+      const applicableLearnings = renderingLearnings.filter((learning) => (
+        (learning.applies_to || []).some((scope) => learningScopes.has(scope))
+      ));
       const request = {
         request_id: `${pkg.story_id}_${microScene.micro_scene_id}`.toLowerCase(),
         created_at: new Date().toISOString(),
@@ -500,10 +524,30 @@ function buildVisualPackage(options = {}) {
           height: workflowTemplate.output.height,
           aspect_ratio: workflowTemplate.output.aspect_ratio
         },
+        environment_contract: {
+          mode: "locked_plate",
+          lock_id: `${scene.scene_id}_${workflowSelection.normalizedShotClass}`.toLowerCase(),
+          camera_setup_id: workflowSelection.normalizedShotClass,
+          allow_regeneration: false,
+          regeneration_allowed_for: [
+            "scene_change",
+            "camera_setup_change",
+            "explicit_environment_story_event"
+          ],
+          immutable_between_character_poses: [
+            "prop_inventory",
+            "prop_positions",
+            "set_geometry",
+            "lighting",
+            "camera_pose"
+          ],
+          character_render_mode: "separate_transparent_layer"
+        },
         prompt_contract: {
-          prompt_text: promptForMicroScene(pkg, scene, microScene, visibleCharacters, references),
+          prompt_text: promptForMicroScene(pkg, scene, microScene, visibleCharacters, references, applicableLearnings),
           negative_prompt_text: negativePromptForMicroScene(microScene, visibleCharacters)
         },
+        rendering_learning_ids: applicableLearnings.map((learning) => learning.id),
         references,
         visible_characters: visibleCharacters.map((character) => ({
           name: character.name,

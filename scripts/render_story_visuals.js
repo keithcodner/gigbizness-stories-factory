@@ -125,6 +125,9 @@ async function renderRequest(request, outputPath, visualConfig, options = {}) {
     shotClass: request.shot_class
   });
   const prompt = renderPromptForRequest(request);
+  if (options.promptSuffix) {
+    prompt.prompt_text = `${prompt.prompt_text} ${String(options.promptSuffix)}`;
+  }
   const referencePaths = referencePathsForRequest(request);
   const storyProviderConfig = buildStoryProviderConfig(visualConfig, request, options);
 
@@ -146,7 +149,10 @@ async function renderRequest(request, outputPath, visualConfig, options = {}) {
         workflowTemplate,
         referenceImagePaths: referencePaths,
         shotType: request.shot_class,
-        referenceDenoise: request.quality_tier === "hero" ? 0.42 : 0.5
+        referenceDenoise: Number(
+          options.referenceDenoise
+          || (request.quality_tier === "hero" ? 0.65 : 0.55)
+        )
       }
     });
     return {
@@ -259,8 +265,9 @@ async function renderStoryVisuals(options = {}) {
 
   for (const item of requests) {
     const request = item.request;
-    const outputPath = path.join(framesDir, `${request.micro_scene_id}.png`);
-    const reportPath = path.join(reportsDir, `${request.micro_scene_id}.json`);
+    const variantSuffix = options.variantLabel ? `_${slugify(options.variantLabel)}` : "";
+    const outputPath = path.join(framesDir, `${request.micro_scene_id}${variantSuffix}.png`);
+    const reportPath = path.join(reportsDir, `${request.micro_scene_id}${variantSuffix}.json`);
 
     if (!options.force && fs.existsSync(outputPath) && fs.statSync(outputPath).size > 0) {
       summary.skipped_count += 1;

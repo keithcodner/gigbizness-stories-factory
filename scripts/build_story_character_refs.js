@@ -8,7 +8,7 @@ const {
 } = require("../src/bricktoon/workflowContracts");
 const { withImageProvider } = require("../src/bricktoon/providers");
 const { validateGeneratedAsset } = require("../src/bricktoon/validateGeneratedAsset");
-const { LAB_ROOT, ensureDir, parseArgs, readJson, writeJson, writeText } = require("./lib");
+const { LAB_ROOT, ensureDir, parseArgs, readJson, resolveFfmpegPath, writeJson, writeText } = require("./lib");
 
 function slugify(value) {
   return String(value || "item")
@@ -37,33 +37,26 @@ function selectedCharacterIds(args) {
     .filter(Boolean);
 }
 
+function selectedVariants(args) {
+  const value = args.variants || args.variant;
+  if (!value) {
+    return null;
+  }
+  return new Set(String(value).split(",").map((item) => slugify(item)).filter(Boolean));
+}
+
 function anchorMap(pkg) {
   return new Map((pkg.reference_anchors || []).map((anchor) => [anchor.anchor_id, anchor]));
 }
 
 function cropImage(inputPath, outputPath, cropHint) {
-  const probe = spawnSync("ffprobe", [
-    "-v",
-    "error",
-    "-select_streams",
-    "v:0",
-    "-show_entries",
-    "stream=width,height",
-    "-of",
-    "csv=p=0:s=x",
-    inputPath
-  ], { encoding: "utf8" });
-  if (probe.status !== 0) {
-    throw new Error(`Failed to inspect reference image: ${inputPath}`);
-  }
-  const [sourceWidth, sourceHeight] = String(probe.stdout || "").trim().split("x").map((value) => Number(value));
-  const cropWidth = Math.max(64, Math.round(sourceWidth * Number(cropHint.width || 1)));
-  const cropHeight = Math.max(64, Math.round(sourceHeight * Number(cropHint.height || 1)));
-  const cropX = Math.max(0, Math.round(sourceWidth * Number(cropHint.x || 0)));
-  const cropY = Math.max(0, Math.round(sourceHeight * Number(cropHint.y || 0)));
   ensureDir(path.dirname(outputPath));
-  const filter = `crop=${cropWidth}:${cropHeight}:${cropX}:${cropY},scale=1024:1024:force_original_aspect_ratio=increase,crop=1024:1024`;
-  const result = spawnSync("ffmpeg", [
+  const cropWidth = Number(cropHint.width || 1);
+  const cropHeight = Number(cropHint.height || 1);
+  const cropX = Number(cropHint.x || 0);
+  const cropY = Number(cropHint.y || 0);
+  const filter = `crop=iw*${cropWidth}:ih*${cropHeight}:iw*${cropX}:ih*${cropY},scale=768:768:force_original_aspect_ratio=decrease,pad=1024:1024:(ow-iw)/2:(oh-ih)/2:color=0xD9E6F2`;
+  const result = spawnSync(resolveFfmpegPath(), [
     "-y",
     "-i",
     inputPath,
@@ -130,6 +123,7 @@ function characterPromptBase(pkg, character) {
     "Output target: a clean production-ready single character reference for later shot conditioning.",
     "Character construction: rounded toy-plastic face, simple expressive eyebrows, readable eyes, clean mouth zone, clear hair or hat silhouette, animation-friendly arm readability.",
     "Framing: single character only, no crowd, no supporting cast, no props unless explicitly requested, no border, no title plate, no text, no speech bubbles.",
+    "Wardrobe surfaces must remain completely plain and unmarked: no chest icon, no emblem, no lettering, no pseudo-text.",
     anchorTraits.length > 0 ? `Approved anchor traits: ${anchorTraits.join(", ")}.` : "",
     avoidTraits.length > 0 ? `Avoid traits: ${avoidTraits.join(", ")}.` : "",
     `Reference policy: ${character.reference_policy || "Use original story-safe traits only."}`,
@@ -142,10 +136,10 @@ function characterPromptBase(pkg, character) {
 
 function variantInstruction(variant) {
   const map = {
-    master: "Canonical master identity frame. Neutral but alive expression. Highest identity lock.",
+    master: "Canonical master identity frame. Preserve the reference's stylized yellow toy-plastic face, curly hair, blue hoodie, and simplified brick-figure anatomy. Show the complete head, face, torso, arms, and hands, centered with clear margin on every side. Neutral but alive expression. Highest identity lock.",
     front: "Front-facing clean reference. Exact facial proportions and mouth placement.",
     three_quarter: "Three-quarter view with the same identity, same hair, same face, same wardrobe.",
-    talking: "Talking expression variant. Mouth area must stay clean and readable for later viseme replacement.",
+    talking: "Talking expression variant with the mouth visibly open mid-speech. Mouth area must stay clean and readable for later viseme replacement.",
     worried: "Worried reaction variant. Keep the same identity and the same wardrobe."
   };
   return map[variant] || "Keep exact same identity and wardrobe continuity.";
@@ -167,12 +161,15 @@ function referenceDenoiseForVariant(variant, referenceImagePaths = []) {
     return 1;
   }
   if (variant === "master") {
-    return 0.28;
+    return 0.45;
   }
   if (variant === "front" || variant === "three_quarter") {
     return 0.34;
   }
-  return 0.4;
+  if (variant === "talking") {
+    return 0.6;
+  }
+  return 0.45;
 }
 
 function relativeToPackage(packageDir, filePath) {
@@ -270,6 +267,7 @@ async function buildStoryCharacterRefs(options = {}) {
 
   const visualConfig = loadVisualGenerationConfig();
   const selectedIds = selectedCharacterIds(options);
+  const variantFilter = selectedVariants(options);
   const characters = (pkg.characters || []).filter((character) => !selectedIds || selectedIds.includes(String(character.id || "").toUpperCase()));
   if (characters.length === 0) {
     throw new Error("No story characters matched the current filter.");
@@ -300,9 +298,9 @@ async function buildStoryCharacterRefs(options = {}) {
 
     const variantResults = [];
     let providerUsed = summary.provider_requested;
-    let masterPath = null;
+    let masterPath = fs.existsSync(variants.master) ? variants.master : null;
 
-    for (const [variant, outputPath] of Object.entries(variants)) {
+    for (const [variant, outputPath] of Object.entries(variants).filter(([name]) => !variantFilter || variantFilter.has(name))) {
       const size = variantSize(variant);
       const request = {
         request_id: `${pkg.story_id}_${characterSlug}_${variant}`.toLowerCase(),

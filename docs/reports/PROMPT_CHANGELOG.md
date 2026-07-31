@@ -2,6 +2,222 @@
 
 Tracks repository changes made in response to user prompts during this implementation cycle.
 
+## 2026-07-30
+
+### Prompt
+
+`ok better but hes floating in mid air and not walking across the ground`
+
+### Findings
+
+- measured each transparent pose and found lowest-foot positions varied by roughly 34 source pixels
+- confirmed camera cropping moved the completed frame while Maya remained centered
+- identified those two issues as the cause of hovering and walking-in-place
+
+### Changes Made
+
+- added automatic alpha-bound measurement for every gait pose
+- normalized character height and anchored every pose's lowest foot to one shared floor coordinate
+- changed traversal to move the transparent character layer continuously from left to right
+- kept the approved environment plate static instead of using camera movement to imitate travel
+- built enough continuous traversal for the full voice duration, eliminating per-cycle horizontal resets
+- generated and reviewed Attempt 007
+- marked Attempt 005 rejected for floating-in-place and retained its evidence
+
+### Current Outcome
+
+- `scene_01_ms_04_walking_gait_v6_grounded_travel.mp4` shows Maya crossing the set on the floor
+- environment props remain fixed
+- character scale and ground contact remain stable across the sampled shot
+
+### Prompt
+
+`its still getting better which is good and the walking animation is good too; but its still malformed scene_01_ms_04_walking_gait_v3_candidate.mp4 read this and look for yourself and improve`
+
+### Findings
+
+- inspected all 24 delivery frames from the first gait cycle
+- confirmed the eight-phase walking structure is improved
+- found RIFE-created extra elbows, smeared hands, merged legs, and fluctuating limb thickness between otherwise clean key poses
+
+### Changes Made
+
+- changed generated sprite-sheet walking to deterministic 24 fps key-pose timing
+- retained the locked environment, complete gait order, voice, and camera tracking
+- generated Attempt 005 and verified clean anatomy in all 24 reviewed frames
+- tested bidirectional optical flow as Attempt 006
+- rejected optical flow after it produced double faces, transparent limbs, motion trails, and incomplete cycle coverage
+- marked malformed Attempt 004 rejected and preserved its evidence
+- kept clean-anatomy Attempt 005 as the current preferred candidate
+
+### Current Outcome
+
+- `scene_01_ms_04_walking_gait_v4_clean_anatomy.mp4` removes the malformed interpolated limbs
+- the remaining limitation is stepped cadence
+- future smoothing should use rig-controlled in-betweens rather than whole-image generative or optical-flow morphing
+
+### Prompt
+
+`organize them in their own folder for each iteration we improve`
+
+### Changes Made
+
+- confirmed Attempts 001–004 are isolated in separate numbered folders
+- changed animation attempt numbering to support automatic next-number allocation
+- connected `scene:walk` directly to the experiment archive
+- made each future walking render automatically generate a cycle review sheet
+- made each future iteration copy its exact pose inputs, rendered video, and review sheet into its own folder
+- made each automatic iteration write a candidate manifest containing its hypothesis and related rendering-learning IDs
+- added filename collision protection when multiple artifacts share a basename
+
+### Current Outcome
+
+- future walking iterations cannot overwrite or mix with earlier attempts
+- each improvement is self-contained and chronologically indexed
+- manual experiments can still be recorded with `npm run animation:attempt -- --attempt auto`
+
+### Prompt
+
+`if you view this video: scene_01_ms_04_walking_smooth_voice.mp4 the animation is better and consistent; but the walking motion is not correct`
+
+### Findings
+
+- confirmed the clip preserves character identity and scene styling well
+- identified that both contact poses use essentially the same leading foot
+- identified that reversing the same half-step produces rocking rather than an alternating walk
+- confirmed the source lacks separate contact, down, passing, and up phases for both support legs
+
+### Changes Made
+
+- retained the consistent character and environment approach
+- added full eight-phase gait handling to `scripts/scene-walk-cycle.js`
+- changed complete gait closure to interpolate from the final phase back to the first instead of reversing the motion
+- added a GTX 1080 full-cycle cadence of 8 source poses per second with 3x interpolation to 24 fps
+- generated and reviewed corrected eight-phase Maya gait assets
+- retired the rejected three-pose learning and recorded the eight-phase method as a candidate pending final artifact cleanup
+
+### Current Outcome
+
+- Attempt 004 has improved stride progression and vertical weight changes
+- one limb-interpolation artifact and weak opposite arm swing remain, so the method has not yet been promoted to active
+
+### Prompt
+
+`also organize each attempt as we get better in discovering the animation process`
+
+### Changes Made
+
+- added `npm run animation:attempt`
+- added numbered scene-specific animation experiment folders
+- added manifests containing hypothesis, outcome, status, related learning IDs, and copied evidence
+- backfilled Attempts 001–004 without overwriting their original files
+- marked Attempts 001–003 rejected and Attempt 004 candidate
+- documented the attempt workflow in the rendering playbook and root README
+
+### Current Outcome
+
+- every significant animation iteration can now be compared chronologically
+- rejected attempts retain their evidence and reasons
+- candidate learnings remain separate from active production rules until review passes
+
+### Prompt
+
+`ensure as we learn these patterns they are recorded for future rendering`
+
+### Changes Made
+
+- created `config/rendering_learnings.json` as the machine-readable rendering-learning registry
+- created `docs/technical_docs/RENDERING_PLAYBOOK.md` as the human-readable production playbook
+- recorded the proven environment-lock, transparent-character, three-pose walk, natural-voice, and multi-frame review patterns
+- added candidate, active, and retired lifecycle rules so experimental observations are not treated as production guidance prematurely
+- added `npm run rendering:learn` for recording future candidate learnings with evidence and validation criteria
+- connected active, scope-matched learning IDs and directives to generated visual requests
+- expanded configuration validation to reject incomplete or duplicate rendering-learning records
+
+### Validation
+
+- rebuilt the scene sample visual package and confirmed its request contains the correct environment and character-layer learning IDs
+- confirmed its prompt contains the active environment-lock directive
+- passed configuration validation and all smoke tests
+
+### Current Outcome
+
+- future visual packages inherit proven rendering rules automatically
+- specialized rules such as walking apply only to matching motion blueprints
+- rendering discoveries now remain versioned, reviewable, and reusable across scenes
+
+### Prompt
+
+`also the background changes when we generate an image, we need to keep the environment props the same; unless the scene changes or something else happen like a camera frame change`
+
+### Changes Made
+
+- created one approved basement environment plate for the scene and camera setup
+- separated Maya into transparent walking-pose layers
+- changed the walk workflow to composite poses onto the fixed plate before interpolation
+- removed chroma keying from the reusable walking path to prevent colored edge artifacts
+- added a scene-and-camera environment continuity contract to future visual requests
+- documented that environment regeneration is allowed only for a scene change, deliberate camera setup change, or explicit set-changing story event
+
+### Current Outcome
+
+- the walking sample retains the same fence, planter, stair structure, bins, boxes, wall blocks, and lighting across the shot
+- framing may change through an intentional camera move without regenerating the environment
+- the locked-plate workflow is reusable for future character animation
+
+### Prompt
+
+`do the next phase`
+
+### Changes Made
+
+- confirmed the repository uses NVM for Windows `1.2.2`, with Node `24.18.1` selected by `.nvmrc`
+- verified the NVM symlink precedes the redundant standalone Node path in the machine PATH
+- downloaded the official Realistic Vision V5.1 Hyper (VAE) pruned fp16 checkpoint into the ComfyUI checkpoint folder
+- verified the 2,132,625,894-byte checkpoint with SHA-256 `F47E942AD4C30D863AD7F53CB60145FFCD2118845DFA705CE8BD6B42E90C4A13`
+- confirmed ComfyUI recognizes `realisticVisionV60B1_v51HyperVAE.safetensors`
+- replaced the stale `-small` checkpoint filename in the workflow and patch defaults
+- configured `COMFYUI_CHECKPOINT` in `.env`
+- ran a live 8-frame motion proof through SD 1.5, IPAdapter, AnimateDiff, and VHS
+- added WinGet-aware FFprobe discovery to `scripts/motion-finish.js`
+- removed the unconditional VHS audio connection from the RIFE workflow so silent proof clips are supported
+- changed the ComfyUI poller to fail immediately when a prompt reports an error or completes without outputs
+- ran a live RIFE 2× finish pass on the new motion proof
+
+### Current Outcome
+
+- the full SD 1.5 + IPAdapter + AnimateDiff runtime model stack is installed and recognized
+- the GTX 1080 fast proof produced an H.264 512x288 clip at 8 fps with 8 frames
+- the RIFE finish pass produced an H.264 512x288 delivery clip at 16 fps with 15 frames
+
+### Prompt
+
+`add the comfort integration on the root of the c drive or the gtx geforce 1080 graphics card. use the existing info in the Readme files`
+
+### Changes Made
+
+- reconstructed ComfyUI at `C:\AI\ComfyUI-GTX1080` from the paths and versions recorded in the repository docs
+- installed Python 3.11 and an isolated PyTorch `2.7.1+cu118` environment
+- installed IPAdapter, Advanced ControlNet, VideoHelperSuite, AnimateDiff Evolved, and Frame Interpolation
+- installed the documented AnimateDiff, CLIP Vision, and IPAdapter support models
+- upgraded the NVIDIA GTX 1080 driver from `457.85` to `527.56` after the old driver failed CUDA memory initialization
+- added an idempotent GTX 1080 installer and launcher under `scripts/`
+- connected `.env` to `http://127.0.0.1:8188` and made the workflow checkpoint configurable through `COMFYUI_CHECKPOINT`
+- added `npm run comfyui:check` and documented install/start/check commands in the root README
+- corrected the launcher for ComfyUI versions where normal VRAM mode is the default and `--normalvram` is no longer accepted
+
+### Validation
+
+- PyTorch reported `2.7.1+cu118`, `cuda=True`, and `NVIDIA GeForce GTX 1080`
+- `torch.cuda.mem_get_info()` succeeded after the driver update
+- ComfyUI `0.29.0` served `/system_stats` at `http://127.0.0.1:8188`
+- `/object_info` confirmed `IPAdapterUnifiedLoader`, `IPAdapterAdvanced`, `ADE_LoadAnimateDiffModel`, `ADE_ApplyAnimateDiffModelSimple`, `VHS_VideoCombine`, and `RIFE VFI`
+
+### Current Outcome
+
+- the C-drive ComfyUI service is live and GPU-backed
+- the final licensed SD 1.5 checkpoint remains operator-supplied and must match `COMFYUI_CHECKPOINT`
+
 ## 2026-07-25
 
 ### Prompt

@@ -23,6 +23,9 @@ function buildPackage(options = {}) {
   const storyPackage = buildStoryPackage(markdown, voiceConfig, {
     sceneLimit: options.sceneLimit || options._?.[1] || 0
   });
+  if (options.outputId || options.packageId) {
+    storyPackage.story_id = slugify(options.outputId || options.packageId);
+  }
 
   const outputDir = path.join(LAB_ROOT, "output", "story_packages", storyPackage.story_id);
   ensureDir(outputDir);

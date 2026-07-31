@@ -1,11 +1,8 @@
 {
-  "assets": [
-    {
-      "id": "reference_4khipx0sjkqg7fnni6ku",
+  "files": {
+    "4khiPx0sJKqg7FnNI6kU.png": {
       "reference_id": "REF_VILLAIN_EDITORIAL_01",
-      "category": "reference",
-      "file": "library/reference_images/4khiPx0sJKqg7FnNI6kU.png",
-      "source_path": "library/reference_images/4khiPx0sJKqg7FnNI6kU.png",
+      "role": "villain_character_and_editorial_style",
       "tags": [
         "villain",
         "executive",
@@ -13,18 +10,13 @@
         "dramatic-lighting",
         "storefront"
       ],
-      "style_family": "premium_bricktoon",
       "continuity_suitability": "crop_before_conditioning",
-      "role": "villain_character_and_editorial_style",
       "approval_status": "approved_as_reference_only",
       "notes": "Use isolated character and lighting traits only. Exclude all headline, logo, package, and storefront branding."
     },
-    {
-      "id": "reference_718174626_18112004557763976_5874873495204050473_n",
+    "718174626_18112004557763976_5874873495204050473_n.jpg": {
       "reference_id": "REF_KID_POLICE_STORE_01",
-      "category": "reference",
-      "file": "library/reference_images/718174626_18112004557763976_5874873495204050473_n.jpg",
-      "source_path": "library/reference_images/718174626_18112004557763976_5874873495204050473_n.jpg",
+      "role": "kid_police_and_store_structure",
       "tags": [
         "kid",
         "worried-expression",
@@ -32,18 +24,13 @@
         "store",
         "evidence-props"
       ],
-      "style_family": "premium_bricktoon",
       "continuity_suitability": "crop_before_conditioning",
-      "role": "kid_police_and_store_structure",
       "approval_status": "approved_as_reference_only",
       "notes": "Use the worried kid, authority lineup, suburban storefront structure, and prop staging. Exclude text and brands."
     },
-    {
-      "id": "reference_722336704_18113340862763976_1543307848620850818_n",
+    "722336704_18113340862763976_1543307848620850818_n.jpg": {
       "reference_id": "REF_HACKER_PHONE_STORE_01",
-      "category": "reference",
-      "file": "library/reference_images/722336704_18113340862763976_1543307848620850818_n.jpg",
-      "source_path": "library/reference_images/722336704_18113340862763976_1543307848620850818_n.jpg",
+      "role": "hacker_phone_and_store_structure",
       "tags": [
         "hacker",
         "worried-expression",
@@ -51,11 +38,9 @@
         "store",
         "city"
       ],
-      "style_family": "premium_bricktoon",
       "continuity_suitability": "crop_before_conditioning",
-      "role": "hacker_phone_and_store_structure",
       "approval_status": "approved_as_reference_only",
       "notes": "Use the hooded hacker silhouette, worried phone pose, store structure, sky palette, and city depth. Exclude text and brands."
     }
-  ]
+  }
 }

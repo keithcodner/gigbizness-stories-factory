@@ -211,10 +211,14 @@ function readReferenceCatalog() {
 
 function buildReferenceAnchors() {
   const references = readReferenceCatalog();
-  const byFile = new Map(references.map((item) => [path.basename(item.file), item]));
+  const byFile = new Map(references
+    .filter((item) => item.file || item.source_path)
+    .map((item) => [path.basename(item.file || item.source_path), item]));
   const villain = byFile.get("4khiPx0sJKqg7FnNI6kU.png") || null;
-  const police = byFile.get("Screenshot_30.png") || null;
-  const kid = byFile.get("Screenshot_29.png") || null;
+  const familyStore = byFile.get("718174626_18112004557763976_5874873495204050473_n.jpg") || null;
+  const cyberStore = byFile.get("722336704_18113340862763976_1543307848620850818_n.jpg") || null;
+  const police = familyStore;
+  const kid = familyStore;
   return [
     villain && {
       anchor_id: "villain_ceo_style",
@@ -222,10 +226,10 @@ function buildReferenceAnchors() {
       reference_id: villain.reference_id,
       file: villain.file,
       crop_hint: {
-        x: 0.44,
+        x: 0.35,
         y: 0.02,
-        width: 0.3,
-        height: 0.9
+        width: 0.38,
+        height: 0.92
       },
       reference_mode: "character_focus",
       allow_direct_image_conditioning: false,
@@ -249,10 +253,10 @@ function buildReferenceAnchors() {
       reference_id: police.reference_id,
       file: police.file,
       crop_hint: {
-        x: 0.56,
-        y: 0.47,
-        width: 0.34,
-        height: 0.26
+        x: 0.12,
+        y: 0.04,
+        width: 0.76,
+        height: 0.48
       },
       reference_mode: "supporting_cast",
       allow_direct_image_conditioning: false,
@@ -277,9 +281,9 @@ function buildReferenceAnchors() {
       file: kid.file,
       crop_hint: {
         x: 0.0,
-        y: 0.57,
+        y: 0.52,
         width: 0.34,
-        height: 0.39
+        height: 0.4
       },
       reference_mode: "character_focus",
       allow_direct_image_conditioning: false,
@@ -295,6 +299,33 @@ function buildReferenceAnchors() {
         "large readable eyes",
         "family-story reaction framing",
         "clean expressive mouth zone"
+      ]
+    },
+    cyberStore && {
+      anchor_id: "hacker_phone_store_style",
+      label: "Hacker, phone reaction, and convenience-store structure",
+      reference_id: cyberStore.reference_id,
+      file: cyberStore.file || cyberStore.source_path,
+      crop_hint: {
+        x: 0.08,
+        y: 0.18,
+        width: 0.84,
+        height: 0.7
+      },
+      reference_mode: "environment_and_prop_style",
+      allow_direct_image_conditioning: false,
+      avoid_traits: [
+        "headline copy",
+        "brand marks",
+        "thumbnail layout",
+        "storefront logo duplication"
+      ],
+      traits: [
+        "hooded hacker silhouette",
+        "clear phone reaction pose",
+        "small-store exterior structure",
+        "bright sky and city depth",
+        "cinematic blue editorial palette"
       ]
     }
   ].filter(Boolean);

@@ -1,0 +1,30 @@
+{
+  "profile_id": "gtx1080_walk_cycle_v1",
+  "label": "GTX 1080 Three-Pose Walking Cycle",
+  "gpu_target": "NVIDIA GeForce GTX 1080 8GB",
+  "source_fps": 2,
+  "interpolation_multiplier": 12,
+  "full_cycle_minimum_poses": 6,
+  "full_cycle_source_fps": 8,
+  "full_cycle_interpolation_multiplier": 3,
+  "full_cycle_renderer": "keypose_hold",
+  "travel_sprite_width": 600,
+  "travel_sprite_height": 680,
+  "travel_character_height": 610,
+  "travel_ground_y": 690,
+  "travel_start_x": 40,
+  "travel_pixels_per_second": 100,
+  "travel_duration_seconds": 8,
+  "delivery_fps": 24,
+  "delivery_width": 1280,
+  "delivery_height": 720,
+  "notes": [
+    "Prefer a complete eight-phase gait: contact, down, passing, up, then the opposite-leg contact, down, passing, and up.",
+    "Three-pose input remains a preview fallback and is not considered biomechanically complete.",
+    "Use transparent character poses and composite them onto one approved environment plate before interpolation.",
+    "Keep identity, camera, props, character scale, and lighting fixed across poses.",
+    "Use clean key-pose holds for generated sprites; enable RIFE only when adjacent poses have rig-consistent limbs and pass a 24-frame deformation review.",
+    "Normalize every sprite by its alpha bounds, anchor its lowest foot to the shared ground line, and move the character layer across the static environment.",
+    "Close a full gait by interpolating from its last pose back to its first; never reverse one step as a substitute for the opposite-leg step."
+  ]
+}

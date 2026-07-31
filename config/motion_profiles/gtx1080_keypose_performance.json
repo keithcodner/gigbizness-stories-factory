@@ -1,0 +1,27 @@
+{
+  "profile_id": "gtx1080_keypose_performance_v1",
+  "label": "GTX 1080 Controlled Key-Pose Performance",
+  "gpu_target": "NVIDIA GeForce GTX 1080 8GB",
+  "transition": {
+    "source_fps": 1,
+    "multiplier": 24,
+    "output_fps": 8
+  },
+  "smoothing": {
+    "source_fps": 8,
+    "multiplier": 2,
+    "output_fps": 16
+  },
+  "assembly": {
+    "pingpong": true,
+    "camera_push": true,
+    "width": 576,
+    "height": 320,
+    "fps": 16
+  },
+  "notes": [
+    "Use two approved, single-character key poses with matching framing.",
+    "RIFE creates the controlled performance transition and a second pass smooths delivery.",
+    "Forward/reverse assembly fits a short dialogue line without a visible one-second loop."
+  ]
+}

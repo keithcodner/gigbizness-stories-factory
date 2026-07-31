@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const os = require("os");
 const { spawnSync } = require("child_process");
-const { LAB_ROOT, ensureDir, parseArgs, readJson, writeJson, writeText } = require("./lib");
+const { LAB_ROOT, ensureDir, parseArgs, readJson, resolveFfmpegPath, writeJson, writeText } = require("./lib");
 
 function slugify(value) {
   return String(value || "item")
@@ -123,7 +123,7 @@ function renderClip(frame, motion, clipsDir, width, height, fps) {
   const durationFrames = Math.max(1, Math.round(durationSeconds * fps));
   const clipPath = path.join(clipsDir, `${frame.micro_scene_id}.mp4`);
   const vf = zoompanFilter(motion, width, height, fps, durationFrames);
-  runCommand("ffmpeg", [
+  runCommand(resolveFfmpegPath(), [
     "-y",
     "-loop",
     "1",
@@ -153,7 +153,7 @@ function concatClips(clips, outputPath) {
   const lines = clips.map((clip) => `file '${clip.clipPath.replaceAll("\\", "/").replace(/'/g, "'\\''")}'`);
   fs.writeFileSync(concatPath, `${lines.join("\n")}\n`, "utf8");
   try {
-    runCommand("ffmpeg", [
+    runCommand(resolveFfmpegPath(), [
       "-y",
       "-f",
       "concat",
@@ -177,7 +177,7 @@ function attachAudio(baseVideoPath, audioPath, outputPath) {
     fs.copyFileSync(baseVideoPath, outputPath);
     return false;
   }
-  runCommand("ffmpeg", [
+  runCommand(resolveFfmpegPath(), [
     "-y",
     "-i",
     baseVideoPath,

@@ -57,6 +57,11 @@ async function runMotionProof(options = {}) {
     height: Number(options.height || args.height),
     frames: Number(options.frames || args.frames),
     fps: Number(options.fps || args.fps),
+    prompt: options.prompt,
+    negativePrompt: options.negativePrompt,
+    seed: options.seed,
+    ipadapterWeight: options.ipadapterWeight,
+    motionDenoise: options.motionDenoise,
     timeoutMs: Number(options.timeoutMs || args.timeout_ms || 900000),
     pollIntervalMs: Number(options.pollIntervalMs || args.poll_interval_ms || 5000)
   });

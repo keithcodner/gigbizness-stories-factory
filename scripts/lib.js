@@ -65,6 +65,26 @@ function writeText(filePath, text) {
   fs.writeFileSync(filePath, text, "utf8");
 }
 
+function resolveFfmpegPath() {
+  if (process.env.FFMPEG_PATH && fs.existsSync(process.env.FFMPEG_PATH)) {
+    return process.env.FFMPEG_PATH;
+  }
+  const comfyRoot = process.env.COMFYUI_INSTALL_ROOT;
+  if (comfyRoot) {
+    const binariesDir = path.join(comfyRoot, ".venv", "Lib", "site-packages", "imageio_ffmpeg", "binaries");
+    if (fs.existsSync(binariesDir)) {
+      const bundled = fs.readdirSync(binariesDir)
+        .filter((name) => /^ffmpeg.*\.exe$/i.test(name))
+        .sort()
+        .reverse()[0];
+      if (bundled) {
+        return path.join(binariesDir, bundled);
+      }
+    }
+  }
+  return "ffmpeg";
+}
+
 async function apiJson(baseUrl, endpoint, options = {}) {
   const response = await fetch(`${baseUrl}${endpoint}`, options);
   if (!response.ok) {
@@ -148,6 +168,14 @@ async function waitForOutputs(baseUrl, promptId, timeoutMs, pollIntervalMs) {
         assets
       };
     }
+    if (record?.status?.status_str === "error") {
+      const messages = record.status.messages || [];
+      const detail = messages.length > 0 ? `: ${JSON.stringify(messages)}` : "";
+      throw new Error(`ComfyUI prompt ${promptId} failed${detail}`);
+    }
+    if (record?.status?.completed === true) {
+      throw new Error(`ComfyUI prompt ${promptId} completed without producing downloadable outputs.`);
+    }
     await sleep(pollIntervalMs);
   }
   throw new Error(`Timed out waiting for ComfyUI prompt ${promptId}.`);
@@ -230,6 +258,7 @@ module.exports = {
   patchWorkflow,
   queuePrompt,
   readJson,
+  resolveFfmpegPath,
   uniqueAssetList,
   uploadInputImage,
   waitForOutputs,

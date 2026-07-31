@@ -1,7 +1,7 @@
 {
   "1": {
     "inputs": {
-      "ckpt_name": "realisticVisionV60B1_v51HyperVAE-small.safetensors"
+      "ckpt_name": "realisticVisionV60B1_v51HyperVAE.safetensors"
     },
     "class_type": "CheckpointLoaderSimple"
   },
@@ -33,11 +33,16 @@
   },
   "5": {
     "inputs": {
+      "image": [
+        "4",
+        0
+      ],
+      "upscale_method": "lanczos",
       "width": 576,
       "height": 320,
-      "batch_size": 16
+      "crop": "center"
     },
-    "class_type": "EmptyLatentImage"
+    "class_type": "ImageScale"
   },
   "6": {
     "inputs": {
@@ -136,10 +141,10 @@
         0
       ],
       "latent_image": [
-        "5",
+        "16",
         0
       ],
-      "denoise": 1
+      "denoise": 0.5
     },
     "class_type": "KSampler"
   },
@@ -170,5 +175,28 @@
       "save_output": true
     },
     "class_type": "VHS_VideoCombine"
+  },
+  "15": {
+    "inputs": {
+      "pixels": [
+        "5",
+        0
+      ],
+      "vae": [
+        "1",
+        2
+      ]
+    },
+    "class_type": "VAEEncode"
+  },
+  "16": {
+    "inputs": {
+      "samples": [
+        "15",
+        0
+      ],
+      "amount": 16
+    },
+    "class_type": "RepeatLatentBatch"
   }
 }

@@ -1,6 +1,6 @@
 # Pipeline State Visual
 
-Last updated: July 26, 2026
+Last updated: July 30, 2026
 
 ## Status Board
 
@@ -23,12 +23,28 @@ VISUAL PIPELINE STATUS
 |   |-- workspace status reporting ......... [WORKING]
 |   `-- workspace validation checks ........ [WORKING]
 |
+|-- RENDERING LEARNING SYSTEM .............. [WORKING]
+|   |-- machine-readable learning registry . [WORKING]
+|   |-- human rendering playbook ........... [WORKING]
+|   |-- candidate/active/retired lifecycle . [WORKING]
+|   |-- scope-aware request injection ....... [WORKING]
+|   |-- environment continuity contract .... [WORKING]
+|   `-- registry validation ................ [WORKING]
+|
+|-- ANIMATION EXPERIMENT ARCHIVE ........... [WORKING]
+|   |-- numbered scene attempts ............ [WORKING]
+|   |-- hypothesis and outcome manifests ... [WORKING]
+|   |-- candidate/accepted/rejected state .. [WORKING]
+|   |-- copied render/review evidence ....... [WORKING]
+|   `-- scene-level attempt index .......... [WORKING]
+|
 |-- COMFYUI GTX 1080 FOUNDATION ............ [WORKING]
 |   |-- active install path ................ [C:\AI\ComfyUI-GTX1080]
 |   |-- gpu detection ...................... [WORKING]
 |   |-- vram operating state ............... [8 GB / NORMAL_VRAM]
+|   |-- nvidia driver ...................... [527.56]
 |   |-- torch runtime ...................... [2.7.1+cu118]
-|   |-- comfyui runtime .................... [0.27.0]
+|   |-- comfyui runtime .................... [0.29.0]
 |   `-- live server availability ........... [WORKING]
 |
 |-- CUSTOM NODE STACK ...................... [WORKING]
@@ -49,7 +65,7 @@ VISUAL PIPELINE STATUS
 |   |-- animatediff motion model ........... [mm_sd_v15_v2.ckpt INSTALLED]
 |   |-- clip vision encoder ................ [CLIP-ViT-H-14 INSTALLED]
 |   |-- ipadapter sd15 plus ................ [INSTALLED]
-|   |-- sd1.5 checkpoint route ............. [WORKING]
+|   |-- sd1.5 checkpoint ................... [REALISTIC VISION V5.1 HYPER INSTALLED]
 |   `-- local model path recognition ....... [WORKING]
 |
 |-- FIRST REAL MOTION WORKFLOW ............. [WORKING]
@@ -116,3 +132,9 @@ VISUAL PIPELINE STATUS
 - Repo proof runner now lives in `scripts/motion-proof.js`.
 - Repo finish-pass runner now lives in `scripts/motion-finish.js`.
 - Canonical story motion execution now renders real clips through `story:motion` and can write an interpolated delivery clip into the workspace `06_motion` stage when `--interpolate` is used.
+- The reconstructed machine integration lives at `C:\AI\ComfyUI-GTX1080`, serves the API at `http://127.0.0.1:8188`, and is reproducible with `scripts/install-comfyui-gtx1080.ps1`.
+- On July 30, 2026, NVIDIA driver `527.56` replaced the incompatible `457.85` driver. PyTorch then verified CUDA memory access and the live ComfyUI API reported all workflow-critical IPAdapter, AnimateDiff, VHS, and RIFE node classes.
+- Realistic Vision V5.1 Hyper (VAE), pruned fp16, is installed as `realisticVisionV60B1_v51HyperVAE.safetensors`; SHA-256 starts with the published AutoV2 hash `F47E942AD4`.
+- Reconstructed-stack fast proof completed on July 30, 2026, producing `bricktoon_wan_i2v_preview_00001.mp4`: H.264, 512x288, 8 fps, 8 frames.
+- Reconstructed-stack RIFE proof completed on July 30, 2026, producing `bricktoon_wan_i2v_preview_00001_rife2x_00001.mp4`: H.264, 512x288, 16 fps, 15 frames.
+- The finish workflow now leaves VHS audio disconnected so silent preview clips can be interpolated without an audio-extraction failure.

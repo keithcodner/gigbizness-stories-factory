@@ -40,11 +40,7 @@
       "filename_prefix": "bricktoon_motion_interpolated",
       "format": "video/h264-mp4",
       "pingpong": false,
-      "save_output": true,
-      "audio": [
-        "1",
-        2
-      ]
+      "save_output": true
     },
     "class_type": "VHS_VideoCombine"
   }

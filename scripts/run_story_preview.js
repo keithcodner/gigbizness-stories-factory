@@ -1,10 +1,10 @@
 const path = require("path");
 const { spawnSync } = require("child_process");
-const { parseArgs } = require("./lib");
+const { parseArgs, resolveFfmpegPath } = require("./lib");
 const { buildPackage } = require("./build_story_package");
 
-function runCommand(command, args, label) {
-  const result = spawnSync(command, args, { encoding: "utf8" });
+function runCommand(command, args, label, env = process.env) {
+  const result = spawnSync(command, args, { encoding: "utf8", env });
   if (result.stdout) {
     process.stdout.write(result.stdout);
   }
@@ -23,7 +23,10 @@ function runStoryPreview(options = {}) {
     pythonScript,
     "--package",
     pkg.package_path
-  ], "generate_story_voice_preview.py");
+  ], "generate_story_voice_preview.py", {
+    ...process.env,
+    FFMPEG_PATH: resolveFfmpegPath()
+  });
   console.log(`Story preview package completed for '${pkg.story_id}'.`);
   return pkg;
 }

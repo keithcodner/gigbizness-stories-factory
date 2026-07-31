@@ -8,7 +8,7 @@ async function checkComfyUi(options = {}) {
     checked_at: new Date().toISOString(),
     base_url: baseUrl,
     comfyui_version: stats.system?.comfyui_version || null,
-    pytorch_version: stats.devices?.[0]?.torch_version || null,
+    pytorch_version: stats.system?.pytorch_version || stats.devices?.[0]?.torch_version || null,
     device_name: stats.devices?.[0]?.name || null,
     raw: stats
   };

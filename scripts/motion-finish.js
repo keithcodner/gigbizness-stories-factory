@@ -6,8 +6,47 @@ const { REPO_ROOT } = require("./lib");
 const { discoverServer, loadProfile } = require("./motion-proof");
 const { execFileSync } = require("child_process");
 
+function resolveFfprobePath() {
+  const explicitPath = process.env.FFPROBE_PATH;
+  if (explicitPath) {
+    return explicitPath;
+  }
+
+  if (process.env.FFMPEG_PATH) {
+    const sibling = path.join(path.dirname(process.env.FFMPEG_PATH), "ffprobe.exe");
+    if (fs.existsSync(sibling)) {
+      return sibling;
+    }
+  }
+
+  const localAppData = process.env.LOCALAPPDATA;
+  if (localAppData) {
+    const packagesRoot = path.join(localAppData, "Microsoft", "WinGet", "Packages");
+    if (fs.existsSync(packagesRoot)) {
+      const packageDirs = fs.readdirSync(packagesRoot)
+        .filter((name) => name.startsWith("Gyan.FFmpeg_"))
+        .sort()
+        .reverse();
+      for (const packageDir of packageDirs) {
+        const packagePath = path.join(packagesRoot, packageDir);
+        for (const releaseDir of fs.readdirSync(packagePath, { withFileTypes: true })) {
+          if (!releaseDir.isDirectory() || !releaseDir.name.startsWith("ffmpeg-")) {
+            continue;
+          }
+          const candidate = path.join(packagePath, releaseDir.name, "bin", "ffprobe.exe");
+          if (fs.existsSync(candidate)) {
+            return candidate;
+          }
+        }
+      }
+    }
+  }
+
+  return "ffprobe";
+}
+
 function probeVideo(videoPath) {
-  const probeJson = execFileSync("ffprobe", [
+  const probeJson = execFileSync(resolveFfprobePath(), [
     "-v",
     "error",
     "-select_streams",
@@ -127,6 +166,7 @@ if (require.main === module) {
 
 module.exports = {
   probeVideo,
+  resolveFfprobePath,
   resolveVideoInput,
   runMotionFinish
 };

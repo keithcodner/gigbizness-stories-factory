@@ -12,7 +12,7 @@
       "input_name": "ckpt_name",
       "source": "env",
       "env_name": "COMFYUI_CHECKPOINT",
-      "default": "realisticVisionV60B1_v51HyperVAE-small.safetensors"
+      "default": "realisticVisionV60B1_v51HyperVAE.safetensors"
     },
     {
       "node_id": "2",
@@ -43,11 +43,18 @@
       "default": 320
     },
     {
-      "node_id": "5",
-      "input_name": "batch_size",
+      "node_id": "16",
+      "input_name": "amount",
       "source": "arg",
       "arg_name": "frames",
       "default": 16
+    },
+    {
+      "node_id": "7",
+      "input_name": "weight",
+      "source": "arg",
+      "arg_name": "ipadapterWeight",
+      "default": 0.62
     },
     {
       "node_id": "14",
@@ -62,6 +69,13 @@
       "source": "arg",
       "arg_name": "seed",
       "default": 123456789
+    },
+    {
+      "node_id": "12",
+      "input_name": "denoise",
+      "source": "arg",
+      "arg_name": "motionDenoise",
+      "default": 0.5
     }
   ]
 }

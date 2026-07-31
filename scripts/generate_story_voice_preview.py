@@ -24,7 +24,7 @@ def run_command(command, label):
         raise RuntimeError(f"{label} failed")
 
 
-def create_silent_wav(output_path: Path, duration_seconds: float, sample_rate: int = 22050):
+def create_silent_wav(output_path: Path, duration_seconds: float, sample_rate: int = 48000):
     frame_count = max(1, int(sample_rate * duration_seconds))
     silence = b"\x00\x00" * frame_count
     with wave.open(str(output_path), "wb") as wav_file:
@@ -47,21 +47,11 @@ def query_selectable_voices():
         "Bypass",
         "-Command",
         r"""
-Add-Type -AssemblyName System.Speech
 $names = @()
-$probe = New-Object System.Speech.Synthesis.SpeechSynthesizer
-foreach ($voice in $probe.GetInstalledVoices()) {
-  $name = $voice.VoiceInfo.Name
-  $tester = New-Object System.Speech.Synthesis.SpeechSynthesizer
-  try {
-    $tester.SelectVoice($name)
-    $names += $name
-  } catch {
-  } finally {
-    $tester.Dispose()
-  }
+$probe = New-Object -ComObject SAPI.SpVoice
+foreach ($voice in $probe.GetVoices()) {
+  $names += $voice.GetDescription()
 }
-$probe.Dispose()
 $names | ConvertTo-Json
 """
     ]
@@ -81,8 +71,9 @@ $names | ConvertTo-Json
 
 def select_voice(profile: dict, installed_voices: list[str]) -> str | None:
     for voice_name in profile.get("voice_preferences", []):
-        if voice_name in installed_voices:
-            return voice_name
+        match = next((installed for installed in installed_voices if installed.startswith(voice_name)), None)
+        if match:
+            return match
     return installed_voices[0] if installed_voices else None
 
 
@@ -98,22 +89,44 @@ def build_ssml(voice_name: str | None, profile: dict, text: str) -> str:
         "</speak>"
     )
 
+def build_sapi_xml(profile: dict, text: str) -> str:
+    rate_percent = float(str(profile.get("rate", "0%")).replace("%", ""))
+    pitch_percent = float(str(profile.get("pitch", "0%")).replace("%", ""))
+    rate = max(-10, min(10, round(rate_percent / 10)))
+    pitch = max(-10, min(10, round(pitch_percent / 5)))
+    phrased = escape(text)
+    phrased = phrased.replace("! ", "!<silence msec='170'/>")
+    phrased = phrased.replace("? ", "?<silence msec='150'/>")
+    phrased = phrased.replace(", ", ",<silence msec='75'/>")
+    phrased = phrased.replace(". ", ".<silence msec='130'/>")
+    return (
+        "<sapi version='1.0'>"
+        f"<pitch middle='{pitch:+d}'><rate speed='{rate:+d}'>{phrased}</rate></pitch>"
+        "</sapi>"
+    )
+
 
 def synthesize_segments(jobs_path: Path):
     script = r"""
-Add-Type -AssemblyName System.Speech
+$ErrorActionPreference = 'Stop'
 $jobs = Get-Content -LiteralPath $args[0] -Raw | ConvertFrom-Json
 foreach ($job in $jobs) {
-  $synth = New-Object System.Speech.Synthesis.SpeechSynthesizer
+  $synth = New-Object -ComObject SAPI.SpVoice
+  $stream = New-Object -ComObject SAPI.SpFileStream
   try {
     if ($job.voice_name) {
-      $synth.SelectVoice($job.voice_name)
+      $token = $synth.GetVoices() | Where-Object { $_.GetDescription() -eq $job.voice_name } | Select-Object -First 1
+      if ($token) {
+        $synth.Voice = $token
+      }
     }
     $synth.Volume = [int]$job.volume
-    $synth.SetOutputToWaveFile($job.output_path)
-    $synth.SpeakSsml($job.ssml)
+    $synth.Rate = [int]$job.rate
+    $stream.Open($job.output_path, 3, $false)
+    $synth.AudioOutputStream = $stream
+    [void]$synth.Speak($job.sapi_xml, 8)
   } finally {
-    $synth.Dispose()
+    try { $stream.Close() } catch {}
   }
 }
 """
@@ -143,7 +156,7 @@ def concat_audio(files: list[Path], output_path: Path):
         concat_path = Path(handle.name)
     try:
         run_command([
-            "ffmpeg",
+            os.environ.get("FFMPEG_PATH", "ffmpeg"),
             "-y",
             "-f",
             "concat",
@@ -157,15 +170,32 @@ def concat_audio(files: list[Path], output_path: Path):
         if concat_path.exists():
             concat_path.unlink()
 
+def polish_voice_segment(file_path: Path):
+    polished_path = file_path.with_name(f"{file_path.stem}_polished.wav")
+    run_command([
+        os.environ.get("FFMPEG_PATH", "ffmpeg"),
+        "-y",
+        "-i",
+        str(file_path),
+        "-af",
+        "highpass=f=90,lowpass=f=10000,equalizer=f=2400:t=q:w=1:g=1.5,acompressor=threshold=-18dB:ratio=2:attack=15:release=120,alimiter=limit=0.95",
+        "-ar",
+        "48000",
+        str(polished_path)
+    ], f"polish voice segment {file_path.name}")
+    os.replace(polished_path, file_path)
+
 
 def normalize_audio(input_path: Path, output_path: Path):
     run_command([
-        "ffmpeg",
+        os.environ.get("FFMPEG_PATH", "ffmpeg"),
         "-y",
         "-i",
         str(input_path),
         "-af",
         "loudnorm=I=-14:LRA=7:TP=-1.5",
+        "-ar",
+        "48000",
         str(output_path)
     ], "ffmpeg normalize voice preview")
 
@@ -202,8 +232,10 @@ def main():
         jobs.append({
             "voice_name": voice_name,
             "volume": int(profile.get("volume", 100)),
+            "rate": max(-10, min(10, round(float(str(profile.get("rate", "0%")).replace("%", "")) / 10))),
             "output_path": str(file_path),
-            "ssml": build_ssml(voice_name, profile, segment.get("text", ""))
+            "text": segment.get("text", ""),
+            "sapi_xml": build_sapi_xml(profile, segment.get("text", ""))
         })
 
     jobs_path = voice_dir / "tts_jobs.json"
@@ -212,6 +244,8 @@ def main():
 
     if jobs:
         synthesize_segments(jobs_path)
+        for job in jobs:
+            polish_voice_segment(Path(job["output_path"]))
 
     for index, segment in enumerate(package_data.get("voice_segments", []), start=1):
         speaker = segment.get("speaker", "NARRATOR")
